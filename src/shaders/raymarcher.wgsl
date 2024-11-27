@@ -90,7 +90,6 @@ fn transform_p(p: vec3f, option: vec2f) -> vec3f
   return repeat(p, vec3f(option.y));
 }
 
-// TODO
 fn scene(p: vec3f) -> vec4f // xyz = color, w = distance
 {
     var d = mix(100.0, p.y, uniforms[17]);
@@ -104,20 +103,34 @@ fn scene(p: vec3f) -> vec4f // xyz = color, w = distance
 
     for (var i = 0; i < all_objects_count; i = i + 1)
     {
-      // get shape and shape order (shapesinfo)
-      // shapesinfo has the following format:
-      // x: shape type (0: sphere, 1: box, 2: torus)
-      // y: shape index
-      // order matters for the operations, they're sorted on the CPU side
+      var shapes_info = shapesinfob[i];
+      let shape_type = i32(shapes_info.x); // (0: sphere, 1: box, 2: torus)
+      var shape_index = i32(shapes_info.y);
+      var shape = shapesb[shape_index];
 
       // call transform_p and the sdf for the shape
-      // call op function with the shape operation
+      var p_ = transform_p(p, shape.transform_animated.xy);
 
-      // op format:
-      // x: operation (0: union, 1: subtraction, 2: intersection)
-      // y: k value
-      // z: repeat mode (0: normal, 1: repeat)
-      // w: repeat offset
+      // call op function with the shape operation
+      if (shape_type == 0)
+      {
+        d = sdf_sphere(p_, shape.radius, shape.quat);
+      }
+      else if (shape_type == 1)
+      {
+        d = sdf_round_box(p_, shape.radius.xyz, shape.radius.w, shape.quat);
+      }
+      else if (shape_type == 2)
+      {
+        d = sdf_torus(p_, shape.radius.xy, shape.quat);
+      }
+
+      var op_ = shape.op.x; // (0: union, 1: subtraction, 2: intersection)
+      var k = shape.op.y;
+      var color = shape.color.xyz;
+      var repeat_mode = shape.op.z; // (0: normal, 1: repeat)
+      var repeat_offset = shape.op.w;
+      var result = op(op_, result.w, d, result.xyz, color, k);
     }
 
     return result;
