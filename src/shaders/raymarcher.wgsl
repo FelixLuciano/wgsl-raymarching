@@ -123,7 +123,6 @@ fn scene(p: vec3f) -> vec4f // xyz = color, w = distance
     return result;
 }
 
-// TODO
 fn march(ro: vec3f, rd: vec3f) -> march_output
 {
   var max_marching_steps = i32(uniforms[5]);
@@ -136,8 +135,21 @@ fn march(ro: vec3f, rd: vec3f) -> march_output
   for (var i = 0; i < max_marching_steps; i = i + 1)
   {
       // raymarch algorithm
+      var position = ro + rd * depth;
+
       // call scene function and march
+      var result = scene(position);
+
       // if the depth is greater than the max distance or the distance is less than the epsilon, break
+      if (depth > MAX_DIST || result.w < EPSILON) {
+          break;
+      }
+
+      // accumulate the depth
+      depth += march_step;
+
+      // accumulate the color
+      color = result.xyz;
   }
 
   return march_output(color, depth, false);
