@@ -3,7 +3,7 @@
 
 ## WGSL RayMarching
 
-![](assets\images\XrFAY6.gif)
+![](assets/images/XrFAY6.gif)
 
 Um Ray Marcher em WGSL (WEBGPU)
 
