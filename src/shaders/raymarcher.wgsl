@@ -32,18 +32,21 @@ struct march_output {
   outline : bool,
 };
 
+// TODO
 fn op_smooth_union(d1: f32, d2: f32, col1: vec3f, col2: vec3f, k: f32) -> vec4f
 {
   var k_eps = max(k, 0.0001);
   return vec4f(col1, d1);
 }
 
+// TODO
 fn op_smooth_subtraction(d1: f32, d2: f32, col1: vec3f, col2: vec3f, k: f32) -> vec4f
 {
   var k_eps = max(k, 0.0001);
   return vec4f(col1, d1);
 }
 
+// TODO
 fn op_smooth_intersection(d1: f32, d2: f32, col1: vec3f, col2: vec3f, k: f32) -> vec4f
 {
   var k_eps = max(k, 0.0001);
@@ -68,11 +71,13 @@ fn op(op: f32, d1: f32, d2: f32, col1: vec3f, col2: vec3f, k: f32) -> vec4f
   return op_smooth_intersection(d2, d1, col2, col1, k);
 }
 
+// TODO
 fn repeat(p: vec3f, offset: vec3f) -> vec3f
 {
   return vec3f(0.0);
 }
 
+// TODO
 fn transform_p(p: vec3f, option: vec2f) -> vec3f
 {
   // normal mode
@@ -85,6 +90,7 @@ fn transform_p(p: vec3f, option: vec2f) -> vec3f
   return repeat(p, vec3f(option.y));
 }
 
+// TODO
 fn scene(p: vec3f) -> vec4f // xyz = color, w = distance
 {
     var d = mix(100.0, p.y, uniforms[17]);
@@ -117,6 +123,7 @@ fn scene(p: vec3f) -> vec4f // xyz = color, w = distance
     return result;
 }
 
+// TODO
 fn march(ro: vec3f, rd: vec3f) -> march_output
 {
   var max_marching_steps = i32(uniforms[5]);
@@ -136,11 +143,13 @@ fn march(ro: vec3f, rd: vec3f) -> march_output
   return march_output(color, depth, false);
 }
 
+// TODO
 fn get_normal(p: vec3f) -> vec3f
 {
   return vec3f(0.0);
 }
 
+// TODO
 // https://iquilezles.org/articles/rmshadows/
 fn get_soft_shadow(ro: vec3f, rd: vec3f, tmin: f32, tmax: f32, k: f32) -> f32
 {
@@ -179,6 +188,7 @@ fn get_ambient_light(light_pos: vec3f, sun_color: vec3f, rd: vec3f) -> vec3f
   return ambient;
 }
 
+// TODO
 fn get_light(current: vec3f, obj_color: vec3f, rd: vec3f) -> vec3f
 {
   var light_position = vec3f(uniforms[13], uniforms[14], uniforms[15]);
@@ -211,11 +221,13 @@ fn set_camera(ro: vec3f, ta: vec3f, cr: f32) -> mat3x3<f32>
   return mat3x3<f32>(cu, cv, cw);
 }
 
+// TODO
 fn animate(val: vec3f, time_scale: f32, offset: f32) -> vec3f
 {
   return vec3f(0.0);
 }
 
+// TODO
 @compute @workgroup_size(THREAD_COUNT, 1, 1)
 fn preprocess(@builtin(global_invocation_id) id : vec3u)
 {
@@ -254,11 +266,15 @@ fn render(@builtin(global_invocation_id) id : vec3u)
   var rd = camera * normalize(vec3(uv, 1.0));
 
   // call march function and get the color/depth
+  var ray = march(ro, rd);
+
   // move ray based on the depth
+  var position = ro + rd * ray.depth;
+
   // get light
-  var color = vec3f(1.0);
-  
+  var light = get_light(position, ray.color, rd);
+
   // display the result
-  color = linear_to_gamma(color);
+  var color = linear_to_gamma(light);
   fb[mapfb(id.xy, uniforms[1])] = vec4(color, 1.0);
 }
