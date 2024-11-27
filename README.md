@@ -3,6 +3,8 @@
 
 ## WGSL RayMarching
 
+![](assets\images\XrFAY6.gif)
+
 Um Ray Marcher em WGSL (WEBGPU)
 
 > [!WARNING]
@@ -20,4 +22,3 @@ Você pode controlar qualquer parametro com o GUI ao lado.
 **Copyright &copy; 2024 Gustavo Beltrão Braga**
 
 This project is [MIT licensed](LICENSE).
-
